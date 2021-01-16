@@ -23,11 +23,8 @@ public class Main {
             long x = Long.parseLong(st.nextToken());
             long y = Long.parseLong(st.nextToken());
 
-            if (x > y) {    // 반례
-                lines.add(new Point(y, x));
-            } else {
-                lines.add(new Point(x, y));
-            }
+
+            lines.add(new Point(x, y));
         }
 
         // 오름차순으로 정렬
