@@ -23,11 +23,11 @@ public class Main {
             return A % C;
         }
 
-        long half = pow(A, B / 2, C);
-        if (B % 2 == 0) {
+        if (B % 2 == 1) {   // 홀수승인 경우
+            return ( pow(A, B - 1, C) * A ) % C;
+        } else {    // 짝수승인 경우
+            long half = pow(A, B / 2, C);
             return (half * half) % C;
-        } else {
-            return (((half * half) % C) * A) % C;
         }
     }
 }
