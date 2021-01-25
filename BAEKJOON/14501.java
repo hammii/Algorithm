@@ -1,32 +1,35 @@
-package com.gachon;
-
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int N = sc.nextInt();
-        int[] time = new int[N + 2];
-        int[] money = new int[N + 2];
+        int N = Integer.parseInt(st.nextToken());
+        int[] T = new int[N + 2];
+        int[] P = new int[N + 2];
         int[] dp = new int[N + 2];
-        int result = 0;
 
         for (int i = 1; i <= N; i++) {
-            time[i] = sc.nextInt();
-            money[i] = sc.nextInt();
+            st = new StringTokenizer(br.readLine());
+            T[i] = Integer.parseInt(st.nextToken());
+            P[i] = Integer.parseInt(st.nextToken());
         }
 
-        for (int i = 1; i <= N; i++) {
-            if (i + time[i] <= N + 1) {     // 일을 한 경우
-                dp[i + time[i]] = Math.max(dp[i + time[i]], dp[i] + money[i]);
-                result = dp[i + time[i]];
+        for (int i = N; i > 0; i--) {
+            int next = i + T[i];
+            if (next > N + 1) { // 일할 수 있는 날짜를 넘어가는 경우
+                dp[i] = dp[i + 1];
+            } else {    // 돈을 더 많이 버는 경우를 게산
+                dp[i] = Math.max(dp[i + 1], dp[next] + P[i]);
             }
-            // 일을 건너뛴 경우
-            dp[i + 1] = Math.max(dp[i + 1], dp[i]);
-            result = dp[i + 1];
         }
+        bw.write(dp[1] + "\n");
 
-        System.out.println(result);
+        br.close();
+        bw.flush();
+        bw.close();
     }
 }
