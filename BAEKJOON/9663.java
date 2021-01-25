@@ -1,45 +1,41 @@
-package com.gachon;
-
-import java.util.Scanner;
+import java.io.*;
 
 public class Main {
-    public static int N;
-    public static int count;
+    static int N;
+    static int cnt = 0;
+    static int[] col;
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        N = sc.nextInt();
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-        for (int i = 1; i <= N; i++) {
-            int[] col = new int[N + 1];
+        N = Integer.parseInt(br.readLine());
+        col = new int[N];
 
-            col[1] = i;
-            dfs(col, 1);
-        }
+        dfs(0);
+        bw.write(cnt + "\n");
 
-        System.out.println(count);
+        br.close();
+        bw.flush();
+        bw.close();
     }
 
-    public static void dfs(int[] col, int row) {
-        if (row == N) {
-            count++;
+    static void dfs(int x) {
+        if (x == N) { // 마지막 행일 때
+            cnt++;
         } else {
-            for (int i = 1; i <= N; i++) {
-                col[row + 1] = i;
-                if (isPossible(col, row + 1)) {
-                    dfs(col, row + 1);
+            for (int i = 0; i < N; i++) {
+                col[x] = i;     // 오른쪽으로 한칸씩 이동
+                if (isValid(x)) {   // 퀸을 놓을 수 있으면
+                    dfs(x + 1); // 다음 줄로 이동
                 }
             }
         }
     }
 
-    public static boolean isPossible(int[] col, int row) {
-        for (int i = 1; i < row; i++) {
-            if (col[i] == col[row]) {   // 세로로 겹치는 경우
-                return false;
-            }
-
-            if (Math.abs(i - row) == Math.abs(col[i] - col[row])) {     // 대각선으로 겹치는 경우
+    static boolean isValid(int level) {
+        for (int i = 0; i < level; i++) {   // 위에 놓여진 퀸들과 비교
+            if (col[i] == col[level] || Math.abs(col[level] - col[i]) == level - i) {   // 같은 열이거나 대각선으로 겹치는 경우
                 return false;
             }
         }
