@@ -1,20 +1,19 @@
-package com.gachon;
-
-import java.util.Scanner;
+import java.io.*;
 
 public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int T = sc.nextInt();
+        int T = Integer.parseInt(br.readLine());
 
-        for (int test_case = 0; test_case < T; test_case++) {
-            int k = sc.nextInt();
-            String[] p = new String[k];
+        for (int test = 0; test < T; test++) {
+            int k = Integer.parseInt(br.readLine());
+            String[] words = new String[k];
             boolean possible = false;
 
             for (int i = 0; i < k; i++) {
-                p[i] = sc.next();
+                words[i] = br.readLine();
             }
 
             loop:
@@ -23,10 +22,10 @@ public class Main {
                     if (i == j) {
                         continue;
                     }
-                    String concat = p[i].concat(p[j]);
+                    String new_word = words[i].concat(words[j]);
 
-                    if (isPalindrome(concat)) {     // 팰린드롬인 경우 출력하고 이중 for문 나가기
-                        System.out.println(concat);
+                    if (isPalindrome(new_word)) {
+                        bw.write(new_word + "\n");
                         possible = true;
                         break loop;
                     }
@@ -34,16 +33,19 @@ public class Main {
             }
 
             if (!possible) {
-                System.out.println(0);
+                bw.write(0 + "\n");
             }
         }
+
+        br.close();
+        bw.flush();
+        bw.close();
     }
 
-    public static boolean isPalindrome(String str) {
-        int i = 0;
-        int j = str.length() - 1;
-        for (; i < str.length() / 2; i++, j--) {
-            if (str.charAt(i) != str.charAt(j)) {
+    static boolean isPalindrome(String word) {
+        int n = word.length();
+        for (int i = 0; i < (n / 2); i++) {
+            if (word.charAt(i) != word.charAt(n - i - 1)) {
                 return false;
             }
         }
