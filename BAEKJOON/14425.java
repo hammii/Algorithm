@@ -1,25 +1,31 @@
+import java.io.*;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int N = sc.nextInt();
-        int M = sc.nextInt();
-        int cnt = 0;
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
         HashMap<String, Integer> map = new HashMap<>();
+        int cnt = 0;
 
         for (int i = 0; i < N; i++) {
-            map.put(sc.next(), 1);
+            map.put(br.readLine(), 1);
         }
         for (int i = 0; i < M; i++) {
-            String str = sc.next();
+            String str = br.readLine();
             if (map.get(str) != null) {
                 cnt++;
             }
         }
+        bw.write(cnt + "\n");
 
-        System.out.println(cnt);
+        br.close();
+        bw.flush();
+        bw.close();
     }
 }
