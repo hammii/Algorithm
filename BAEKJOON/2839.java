@@ -8,22 +8,19 @@ public class Main {
         int N = Integer.parseInt(br.readLine());
         int cnt = 0;
 
-        while (N > 0) {
+        while (true) {
             if (N % 5 == 0) {
-                N -= 5;
-                cnt++;
-            } else if (N % 3 == 0) {
-                N -= 3;
-                cnt++;
-            } else if (N > 5) {
-                N -= 5;
-                cnt++;
-            } else {
+                cnt += N / 5;
+                break;
+            }
+            N -= 3;
+            cnt++;
+
+            if (N < 0) {
                 cnt = -1;
                 break;
             }
         }
-
         bw.write(cnt + "\n");
 
         br.close();
