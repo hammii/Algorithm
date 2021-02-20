@@ -12,17 +12,12 @@ class Solution {
 
         if (answer.length() >= 16) {     // 6단계
             answer = answer.substring(0, 15);
-
-            if (answer.charAt(answer.length() - 1) == '.') {
-                answer = answer.substring(0, answer.length() - 1);
-            }
+            answer = answer.replaceAll("[.]$","");
         }
 
         if (answer.length() <= 2) {  // 7단계
-            char last = answer.charAt(answer.length() - 1);
-
             while (answer.length() < 3) {
-                answer += last;
+                answer += answer.charAt(answer.length()-1);
             }
         }
 
