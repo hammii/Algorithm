@@ -5,9 +5,8 @@ public class Solution {
         int answer = 0;
 
         while(n > 0){
-            int mod = n % 10;
-            answer += mod;
-            n /= mod;
+            answer += n % 10;
+            n /= 10;
         }
 
         return answer;
