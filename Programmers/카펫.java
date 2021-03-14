@@ -2,10 +2,9 @@ class Solution {
     public int[] solution(int brown, int yellow) {
         int[] answer = new int[2];
 
-        for (int i = 1; i <= yellow; i++) {
-            if (yellow % i != 0) continue;
+        for (int row = 1; row <= yellow; row++) {
+            if (yellow % row != 0) continue;
 
-            int row = i;
             int col = yellow / row;
             if (row > col) break;
 
@@ -14,6 +13,7 @@ class Solution {
                 answer[1] = row + 2;
             }
         }
+        
         return answer;
     }
 }
