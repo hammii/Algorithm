@@ -1,41 +1,19 @@
 class Solution {
-    public static String origin;
-    public static boolean[] visited;
-    public static String MAX = "0";
-    
     public String solution(String number, int k) {
-        origin = number;
-        visited = new boolean[number.length()];
+        StringBuilder answer = new StringBuilder();
 
-        int idx = 0;
-        for (int i = 0; i <= k; i++) {
-            if (origin.charAt(i) == 9) {
-                MAX = "9";
-                idx = i;
-                break;
+        int left = 0;
+        int comp;
+        for (int i = 0; i < number.length() - k; i++) {
+            comp = 0;
+            for (int j = left; j <= i + k; j++) {
+                if (comp < number.charAt(j) - '0') {
+                    comp = number.charAt(j) - '0';
+                    left = j + 1;
+                }
             }
-            if (Integer.parseInt(origin.charAt(i) + "") > Integer.parseInt(MAX)) {
-                MAX = String.valueOf(origin.charAt(i));
-                idx = i;
-            }
+            answer.append(comp);
         }
-
-        dfs(MAX, idx + 1, number.length() - k, 1);
-        return MAX;
-    }
-    
-    public static void dfs(String number, int idx, int len, int cnt) {
-        if (len == cnt) {
-            if (MAX.compareTo(number) < 0) MAX = number;
-            return;
-        }
-
-        for (int i = idx; i < origin.length(); i++) {
-            if (visited[i]) continue;
-
-            visited[i] = true;
-            dfs(number + origin.charAt(i), i + 1, len, cnt + 1);
-            visited[i] = false;
-        }
+        return answer.toString();
     }
 }
