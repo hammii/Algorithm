@@ -4,24 +4,15 @@ class Solution {
     static List<String> answer = new ArrayList<>();
     static String route = "";
     static boolean[] visited;
-
+    
     public String[] solution(String[][] tickets) {
-        for (int i = 0; i < tickets.length; i++) {
-            visited = new boolean[tickets.length];
-            String start = tickets[i][0];
-            String end = tickets[i][1];
-
-            if (start.equals("ICN")) {
-                route = "ICN" + ",";
-                visited[i] = true;
-                dfs(tickets, end, 1);
-            }
-        }
+        visited = new boolean[tickets.length];
+        dfs(tickets, "ICN", 0);
 
         Collections.sort(answer);
         return answer.get(0).split(",");
     }
-
+    
     public static void dfs(String[][] tickets, String end, int cnt) {
         route += end + ",";
 
