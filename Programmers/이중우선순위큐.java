@@ -15,12 +15,10 @@ class Solution {
                 reverse_pq.add(num);
             } else if (oper.equals("D")) {
                 if (num == 1) { // 최댓값 삭제
-                    Integer max = reverse_pq.peek();
+                    Integer max = reverse_pq.poll();
                     pq.remove(max);
-                    reverse_pq.remove(max);
                 } else {    // 최솟값 삭제
-                    Integer min = pq.peek();
-                    pq.remove(min);
+                    Integer min = pq.poll();
                     reverse_pq.remove(min);
                 }
             }
