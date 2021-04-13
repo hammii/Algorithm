@@ -1,5 +1,3 @@
-package myPakage;
-
 import java.util.*;
 import java.awt.Point;
 import java.io.*;
@@ -39,9 +37,8 @@ public class Main {
 		int max = 0;
 		for (int i = 1; i <= pow; i++) {
 			for (int j = 1; j <= pow; j++) {
-				if (!visited[i][j]) {
+				if (!visited[i][j] && A[i][j] != 0) {
 					max = Math.max(max, countBig(i, j));
-//					System.out.println(max);
 				}
 			}
 		}
@@ -59,6 +56,7 @@ public class Main {
 				rotateMap(i, j, L);
 			}
 		}
+
 	}
 
 	static void rotateMap(int r, int c, int size) {
@@ -89,11 +87,13 @@ public class Main {
 			for (int i = end_c; i > start_c; i--) { // 넷째줄 채우기
 				A[start_r][i] = temp.poll();
 			}
-			sqaure--;
 		}
+
 	}
 
 	static void checkIce() {
+		ArrayList<Point> temp = new ArrayList<>();
+
 		for (int i = 1; i <= pow; i++) {
 			for (int j = 1; j <= pow; j++) {
 				int cnt = 0;
@@ -110,9 +110,14 @@ public class Main {
 				}
 
 				if (cnt >= 2) {
-					A[i][j]--;
+					temp.add(new Point(i, j));
 				}
 			}
+		}
+
+		for (Point cur : temp) {
+			if (A[cur.x][cur.y] == 0) continue;
+			A[cur.x][cur.y]--;
 		}
 	}
 
@@ -131,7 +136,7 @@ public class Main {
 				int next_c = cur.y + dc[i];
 
 				if (next_r > 0 && next_r <= pow && next_c > 0 && next_c <= pow) {
-					if (!visited[next_r][next_c]) {
+					if (!visited[next_r][next_c] && A[next_r][next_c] != 0) {
 						q.add(new Point(next_r, next_c));
 						visited[next_r][next_c] = true;
 					}
