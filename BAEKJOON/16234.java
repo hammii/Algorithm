@@ -1,102 +1,95 @@
+import java.awt.Point;
 import java.io.*;
 import java.util.*;
 
-class Point {
-	int row;
-	int col;
-	int value;
-
-	public Point(int row, int col, int value) {
-		this.row = row;
-		this.col = col;
-		this.value = value;
-	}
-}
-
 public class Main {
-	public static int[] dy = { -1, 0, 1, 0 }; // 상,좌,하,우 순서
-	public static int[] dx = { 0, -1, 0, 1 };
-	public static int N, L, R;
-	public static boolean[][] visited;
-	public static int[][] map;
-	public static int answer = 0;
+	static int[] dx = { -1, 1, 0, 0 };
+	static int[] dy = { 0, 0, -1, 1 };
+	static int N, L, R;
+	static int[][] A;
+	static boolean[][] visited;
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
 		StringTokenizer st = new StringTokenizer(br.readLine());
+
 		N = Integer.parseInt(st.nextToken());
 		L = Integer.parseInt(st.nextToken());
 		R = Integer.parseInt(st.nextToken());
-		map = new int[N][N];
+		A = new int[N + 1][N + 1];
+		visited = new boolean[N + 1][N + 1];
 
-		for (int i = 0; i < N; i++) {
+		for (int i = 1; i <= N; i++) {
 			st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < N; j++) {
-				map[i][j] = Integer.parseInt(st.nextToken());
+			for (int j = 1; j <= N; j++) {
+				A[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
 
-		boolean flag = true;
-		while (flag) {
-			flag = false;
-			visited = new boolean[N][N];
-			answer++;
+		int answer = 0;
+		while (true) {
+			visited = new boolean[N + 1][N + 1];
 
-			for (int i = 0; i < N; i++) {
-				for (int j = 0; j < N; j++) {
-					if (bfs(i, j)) {
-						flag = true;
-					}
-				}
-			}
-		}
-
-		bw.write(answer - 1 + "\n");
-
-		bw.flush();
-		bw.close();
-	}
-
-	public static boolean bfs(int i, int j) {
-		boolean flag = false;
-		Queue<Point> queue = new LinkedList<>();
-		queue.add(new Point(i, j, map[i][j]));
-		visited[i][j] = true;
-
-		Queue<Point> temp = new LinkedList<>();
-		temp.add(new Point(i, j, map[i][j]));
-
-		int sum = map[i][j];
-
-		while (!queue.isEmpty()) {
-			Point cur = queue.poll();
-
-			for (int k = 0; k < 4; k++) {
-				int next_r = cur.row + dy[k];
-				int next_c = cur.col + dx[k];
-				if (next_r >= 0 && next_r < N && next_c >= 0 && next_c < N) {
-					if (!visited[next_r][next_c]) {
-						int diff = Math.abs(map[next_r][next_c] - cur.value);
-						if (diff >= L && diff <= R) {
+			boolean flag = false;
+			for (int i = 1; i <= N; i++) {
+				for (int j = 1; j <= N; j++) {
+					if (!visited[i][j]) {
+						if(bfs(i,j)) {
 							flag = true;
-							queue.add(new Point(next_r, next_c, map[next_r][next_c]));
-							temp.add(new Point(next_r, next_c, map[next_r][next_c]));
-							visited[next_r][next_c] = true;
-							sum += map[next_r][next_c];
 						}
 					}
 				}
 			}
+
+			if (flag == false) {
+				break;
+			}
+			answer++;
 		}
 
-		if (temp.size() > 1) {
-			for (Point p : temp) {
-				map[p.row][p.col] = sum / temp.size();
+		bw.write(answer + "\n");
+		bw.close();
+		br.close();
+	}
+
+	public static boolean bfs(int r, int c) {
+		Queue<Point> q = new LinkedList<>();
+		Queue<Point> temp = new LinkedList<>();
+		q.offer(new Point(r, c));
+		visited[r][c] = true;
+
+		boolean flag = false;
+		int sum = 0;
+		while (!q.isEmpty()) {
+			Point cur = q.poll();
+			temp.offer(cur);
+			sum += A[cur.x][cur.y];
+
+			for (int i = 0; i < 4; i++) {
+				int next_x = cur.x + dx[i];
+				int next_y = cur.y + dy[i];
+
+				if (next_x > 0 && next_x <= N && next_y > 0 && next_y <= N) {
+					if (!visited[next_x][next_y]) {
+						int diff = Math.abs(A[cur.x][cur.y] - A[next_x][next_y]);
+
+						if (L <= diff && diff <= R) {
+							q.offer(new Point(next_x, next_y));
+							visited[next_x][next_y] = true;
+
+							flag = true;
+						}
+					}
+				}
+
 			}
 		}
 
+		for (Point p : temp) {	// 인구수 갱신
+			A[p.x][p.y] = sum / temp.size();
+		}
+		
 		return flag;
 	}
 }
