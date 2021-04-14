@@ -1,18 +1,16 @@
+import java.util.*;
 import java.awt.Point;
 import java.io.*;
-import java.util.*;
-
-// N: 크기, M: 활성 바이러스 개수
-// map: 빈칸(0), 벽(1), 바이러스를 놓을 수 있는 위치(2)
-// virus: 바이러스 맵
 
 public class Main {
-    static int[] dr = {-1, 1, 0, 0};
-    static int[] dc = {0, 0, -1, 1};
+    static int[] dx = { -1, 1, 0, 0 };
+    static int[] dy = { -0, 0, -1, 1 };
     static int N, M;
     static int[][] map;
-    static int answer = -1;
-    static int min_time = Integer.MAX_VALUE;
+    static boolean[][] visited;
+    static ArrayList<Point> virus;
+    static boolean[] choose;
+    static int answer = Integer.MAX_VALUE;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -21,118 +19,119 @@ public class Main {
 
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
+        map = new int[N + 1][N + 1];
+        visited = new boolean[N + 1][N + 1];
+        virus = new ArrayList<>();
 
-        map = new int[N][N];
-        ArrayList<Point> virus_list = new ArrayList<>();
+        boolean zero_flag = false;
 
-        for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine(), " ");
+        for (int i = 1; i <= N; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 1; j <= N; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+                if (map[i][j] == 2) {
+                    virus.add(new Point(i, j));
+                }
 
-            for (int j = 0; j < N; j++) {
-                int num = Integer.parseInt(st.nextToken());
-                map[i][j] = num;
-                if (num == 2) {
-                    virus_list.add(new Point(i, j));
+                if (map[i][j] == 0) {
+                    zero_flag = true;
                 }
             }
         }
 
-        dfs(virus_list, new ArrayList<>());
+        if (!zero_flag) { // 빈칸이 하나도 없을 경우
+            answer = 0;
+        } else {
+            choose = new boolean[virus.size()];
+            dfs(0, 0);
+
+            if (answer == Integer.MAX_VALUE) {
+                answer = -1;
+            }
+        }
 
         bw.write(answer + "\n");
-        bw.flush();
         bw.close();
-
+        br.close();
     }
 
-    public static void dfs(ArrayList<Point> origin_list, ArrayList<Point> new_list) {
-        if (new_list.size() == M) {
-            if (!bfs(new_list)) { // 가능한 곳이 한군데라도 있으면
-                answer = min_time;
-            }
+    public static void dfs(int idx, int cnt) {
+        if (cnt == M) {
+            spreadVirus(); // 바이러스 퍼뜨리기
+            return;
         }
 
-        for (int i = 0; i < origin_list.size(); i++) {
-            Point p = origin_list.get(i);
-            if (new_list.contains(p)) {
-                continue;
+        for (int i = idx; i < virus.size(); i++) {
+            if (!choose[i]) {
+                choose[i] = true;
+                dfs(i, cnt + 1);
+                choose[i] = false;
             }
-            new_list.add(p);
-            dfs(origin_list, new_list);
-            new_list.remove(p);
         }
-
     }
 
-    public static boolean bfs(ArrayList<Point> list) {
-        String[][] virus = new String[N][N];
+    public static void spreadVirus() {
+        visited = new boolean[N + 1][N + 1];
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                Point p = new Point(i, j);
-
-                if (map[i][j] == 0) { // 빈칸
-                    virus[i][j] = "-1";
-                } else if (map[i][j] == 1) { // 벽
-                    virus[i][j] = "-";
-                } else if (map[i][j] == 2 && !list.contains(p)) { // 비활성 바이러스
-                    virus[i][j] = "*";
-                } else {
-                    virus[i][j] = "0";
-                }
+        Queue<Point> q = new LinkedList<>();
+        for (int i = 0; i < virus.size(); i++) { // 선택된 바이러스라면 큐에 추가
+            if (choose[i]) {
+                q.add(virus.get(i));
+                visited[virus.get(i).x][virus.get(i).y] = true;
             }
         }
 
-//        for (int i = 0; i < N; i++) {
-//            for (int j = 0; j < N; j++) {
-//                System.out.print(virus[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
+        int cnt = 0;
+        int t = 0;
 
-        Queue<Point> queue = new LinkedList<>(list);
-        int time = 0;
-        while (true) {
-            Queue<Point> near_queue = new LinkedList<>();
+        while (!q.isEmpty()) {
+            boolean flag = false;
+            int size = q.size();
 
-            while (!queue.isEmpty()) {
-                Point cur = queue.poll();
+            for (int i = 0; i < size; i++) {
+                Point cur = q.poll();
 
-                for (int i = 0; i < 4; i++) {
-                    int next_r = cur.x + dr[i];
-                    int next_c = cur.y + dc[i];
+                for (int k = 0; k < 4; k++) {
+                    int next_x = cur.x + dx[k];
+                    int next_y = cur.y + dy[k];
 
-                    if (next_r < 0 || next_r >= N || next_c < 0 || next_c >= N) {
-                        continue;
-                    }
+                    if (next_x > 0 && next_x <= N && next_y > 0 && next_y <= N) {
+                        if (!visited[next_x][next_y]) {
+                            visited[next_x][next_y] = true;
 
-                    if (virus[next_r][next_c].equals("-1") ) { // 방문하지 않은 곳이라면
-                        virus[next_r][next_c] = String.valueOf(time);
-                        near_queue.add(new Point(next_r, next_c));
-                    }
-                    if (virus[next_r][next_c].equals("*")) { // 비활성화 바이러스를 지나갈 경우
-                        virus[next_r][next_c] = String.valueOf(time);
+                            if (map[next_x][next_y] == 0) {
+                                q.add(new Point(next_x, next_y));
+                                flag = true;
+                            }
+                            if (map[next_x][next_y] == 2) { // 비활성 바이러스인 경우
+                                q.add(new Point(next_x, next_y));
+                            }
+                        }
                     }
                 }
             }
-            if (near_queue.isEmpty()) {
-                break;
+
+            if (!flag) { // 빈칸은 없고 비활성 바이러스만 있는 경우
+                t++;
+            } else {
+                cnt += ++t;
+                t = 0;
             }
-            queue.addAll(near_queue);
-            time++;
         }
 
-        boolean flag = false;
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (virus[i][j].equals("-1")) { // 방문하지 않은 곳이 한군데라도 있으면
-                    flag = true;
-                    break;
+        if (checkVisit()) {
+            answer = Math.min(answer, cnt);
+        }
+    }
+
+    public static boolean checkVisit() { // 방문 안한 곳 있는지 확인
+        for (int i = 1; i <= N; i++) {
+            for (int j = 1; j <= N; j++) {
+                if (map[i][j] == 0 && !visited[i][j]) {
+                    return false;
                 }
             }
         }
-
-        min_time = Math.min(min_time, time); // 최소값으로 정답 업데이트
-        return flag;
+        return true;
     }
 }
