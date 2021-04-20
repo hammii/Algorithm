@@ -1,21 +1,51 @@
-import java.awt.Point;
 import java.io.*;
 import java.util.*;
 
+class Node implements Comparable<Node> {
+	int x, y, dist;
+
+	public Node(int x, int y, int dist) {
+		this.x = x;
+		this.y = y;
+		this.dist = dist;
+	}
+
+	@Override
+	public int compareTo(Node o) {
+		if (this.dist != o.dist) {
+			return this.dist - o.dist;
+		} else {
+			if (this.x != o.x) {
+				return this.x - o.x;
+			} else {
+				return this.y - o.y;
+			}
+		}
+	}
+}
+
+class Path {
+	int start_x, start_y, end_x, end_y;
+
+	public Path(int start_x, int start_y, int end_x, int end_y) {
+		this.start_x = start_x;
+		this.start_y = start_y;
+		this.end_x = end_x;
+		this.end_y = end_y;
+	}
+}
+
 public class Main {
 	static int N, M, fuel;
-	static int[][] start;
-	static int[][] end;
 	static int[][] map;
-	static int[][] start_end_map;
 	static boolean[][] visited;
 	static int joon_x, joon_y;
-	static int dfs_min = Integer.MAX_VALUE;
-	static int answer = 0;
-	static boolean[] finished;
 
 	static int[] dx = { -1, 0, 1, 0 };
 	static int[] dy = { 0, 1, 0, -1 };
+
+	static ArrayList<Node> startList = new ArrayList<>();
+	static ArrayList<Path> pathList = new ArrayList<>();
 
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -25,185 +55,136 @@ public class Main {
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
 		fuel = Integer.parseInt(st.nextToken());
-		start = new int[M + 1][M + 1];
-		end = new int[M + 1][M + 1];
 		map = new int[N + 1][N + 1];
-		start_end_map = new int[N + 1][N + 1];
-		finished = new boolean[M + 1];
+		visited = new boolean[N + 1][N + 1];
 
 		for (int i = 1; i <= N; i++) {
 			st = new StringTokenizer(br.readLine());
 			for (int j = 1; j <= N; j++) {
 				map[i][j] = Integer.parseInt(st.nextToken());
+				if (map[i][j] == 1) {
+					map[i][j] = -1;
+				}
 			}
 		}
+
 		st = new StringTokenizer(br.readLine());
 		joon_x = Integer.parseInt(st.nextToken());
 		joon_y = Integer.parseInt(st.nextToken());
 
+		boolean flag = false;
 		for (int i = 1; i <= M; i++) {
 			st = new StringTokenizer(br.readLine());
 			int start_x = Integer.parseInt(st.nextToken());
 			int start_y = Integer.parseInt(st.nextToken());
 			int end_x = Integer.parseInt(st.nextToken());
 			int end_y = Integer.parseInt(st.nextToken());
-
-			start[i][0] = start_x;
-			start[i][1] = start_y;
-			end[i][0] = end_x;
-			end[i][1] = end_y;
-			start_end_map[start_x][start_y] = i;
-			start_end_map[end_x][end_y] = -i;
+			pathList.add(new Path(start_x, start_y, end_x, end_y));
+			map[start_x][start_y] = i;
 		}
 
 		while (true) {
+			if (pathList.size() == 0) { // 모두 데려다줬을 경우
+				System.out.println(fuel);
+				return;
+			}
+
+			startList.clear();
 			visited = new boolean[N + 1][N + 1];
 
-			Point pick = bfs(); // 출발점 선정
-			if (pick == null) {
-				answer = -1;
-				break;
+			getStart(joon_x, joon_y); // 출발지 선정
+
+			if (startList.size() == 0) { // 벽에 막힌 경우
+				System.out.println(-1);
+				return;
 			}
 
-			joon_x = pick.x;
-			joon_y = pick.y;
+			Node start = startList.get(0);
+			map[start.x][start.y] = 0;
+			fuel -= start.dist;
 
-			int num = start_end_map[pick.x][pick.y];
-
-			int end_x = end[num][0];
-			int end_y = end[num][1];
-
-			if (fuel < 0) {
-				answer = -1;
-				break;
+			if (fuel < 0) {	// 연료 떨어진 경우
+				System.out.println(-1);
+				return;
 			}
 
 			visited = new boolean[N + 1][N + 1];
 
-			dfs_min = Integer.MAX_VALUE;
-			dfs(pick.x, pick.y, end_x, end_y, 0);
+			int dist = 0;
+			for (int i = 0; i < pathList.size(); i++) { // 도착지 선정
+				Path path = pathList.get(i);
 
-			joon_x = end_x;
-			joon_y = end_y;
+				if (path.start_x == start.x && path.start_y == start.y) {
+					dist = getDist(path.start_x, path.start_y, path.end_x, path.end_y);
 
-			fuel -= dfs_min;
-
-			if (fuel < 0) {
-				answer = -1;
-				break;
+					if (dist == -1) { // 벽에 막힌 경우
+						System.out.println(-1);
+						return;
+					}
+					joon_x = path.end_x;
+					joon_y = path.end_y;
+					pathList.remove(path);
+					break;
+				}
 			}
 
-			fuel += dfs_min * 2;
+			fuel -= dist;
 
-			start_end_map[pick.x][pick.y] = 0;
-			start_end_map[end_x][end_y] = 0;
-
-			finished[num] = true; // 완주 !!!
-
-			if (check()) {
-				break;
+			if (fuel < 0) {	// 연료 떨어진 경우
+				System.out.println(-1);
+				return;
 			}
+
+			fuel += dist * 2;
 		}
 
-		bw.write((answer == -1 ? -1 : fuel) + "\n");
-		bw.close();
-		br.close();
 	}
 
-	public static boolean check() {
-		for (int i = 1; i <= M; i++) {
-			if (!finished[i]) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public static Point bfs() {
-		Queue<Point> q = new LinkedList<>();
-		q.add(new Point(joon_x, joon_y));
-		visited[joon_x][joon_y] = true;
-
-		int cnt = 0;
-
-		List<Point> sortList = new ArrayList<>();
+	public static void getStart(int x, int y) {
+		PriorityQueue<Node> q = new PriorityQueue<>();
+		q.add(new Node(x, y, 0));
 
 		while (!q.isEmpty()) {
-			List<Point> temp = new ArrayList<>();
-			boolean flag = false;
-
-			while (!q.isEmpty()) {
-				Point cur = q.poll();
-				for (int i = 0; i < 4; i++) {
-					int next_x = cur.x + dx[i];
-					int next_y = cur.y + dy[i];
-
-					if (next_x > 0 && next_x <= N && next_y > 0 && next_y <= N) {
-						if (map[next_x][next_y] != 1 && !visited[next_x][next_y]) {
-							temp.add(new Point(next_x, next_y));
-							visited[next_x][next_y] = true;
-						}
-					}
-				}
-			}
-
-			for (Point p : temp) {
-				if (start_end_map[p.x][p.y] > 0) {
-					sortList.add(new Point(p.x, p.y));
-					flag = true;
-				}
-				q.add(p);
-			}
-			cnt++;
-
-			if (flag) {
+			Node cur = q.poll();
+			if (map[cur.x][cur.y] >= 1) {
+				startList.add(new Node(cur.x, cur.y, cur.dist));
 				break;
 			}
 
-		}
-
-		if (sortList.size() > 1) { // 가장 작은 승객 고르기
-			Collections.sort(sortList, new Comparator<Point>() {
-				@Override
-				public int compare(Point o1, Point o2) {
-					if (o1.x > o2.x) {
-						return 1;
-					} else if (o1.x == o2.x) {
-						if (o1.y > o2.y) {
-							return 1;
-						}
-					} else {
-						return -1;
+			for (int i = 0; i < 4; i++) {
+				int nx = cur.x + dx[i];
+				int ny = cur.y + dy[i];
+				if (nx > 0 && nx <= N && ny > 0 && ny <= N) {
+					if (map[nx][ny] != -1 && !visited[nx][ny]) {
+						visited[nx][ny] = true;
+						q.add(new Node(nx, ny, cur.dist + 1));
 					}
-					return 0;
-				}
-			});
-		} else if (sortList.size() == 0) {
-			return null;
-		}
-
-		fuel -= cnt; // 태우러 가는 길 연료 사용
-
-		return sortList.get(0);
-	}
-
-	public static void dfs(int x, int y, int end_x, int end_y, int cnt) {
-		if (x == end_x && y == end_y) {
-			dfs_min = Math.min(dfs_min, cnt);
-			return;
-		}
-
-		for (int i = 0; i < 4; i++) {
-			int next_x = x + dx[i];
-			int next_y = y + dy[i];
-
-			if (next_x > 0 && next_x <= N && next_y > 0 && next_y <= N) {
-				if (map[next_x][next_y] != 1 && !visited[next_x][next_y]) {
-					visited[next_x][next_y] = true;
-					dfs(next_x, next_y, end_x, end_y, cnt + 1);
-					visited[next_x][next_y] = false;
 				}
 			}
 		}
+	}
+
+	public static int getDist(int start_x, int start_y, int end_x, int end_y) {
+		Queue<Node> q = new LinkedList<>();
+		q.add(new Node(start_x, start_y, 0));
+
+		while (!q.isEmpty()) {
+			Node cur = q.poll();
+			if (cur.x == end_x && cur.y == end_y) {
+				return cur.dist;
+			}
+
+			for (int i = 0; i < 4; i++) {
+				int nx = cur.x + dx[i];
+				int ny = cur.y + dy[i];
+				if (nx > 0 && nx <= N && ny > 0 && ny <= N) {
+					if (map[nx][ny] != -1 && !visited[nx][ny]) {
+						visited[nx][ny] = true;
+						q.add(new Node(nx, ny, cur.dist + 1));
+					}
+				}
+			}
+		}
+		return -1;
 	}
 }
