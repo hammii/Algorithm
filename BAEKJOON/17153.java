@@ -35,7 +35,6 @@ class Node implements Comparable<Node> {
 public class Main {
 	static int N, M, D;
 	static int[][] origin_map, map;
-	static int[][] attack;
 	static boolean[] visited;
 	static ArrayList<Node> origin_enemy;
 	static ArrayList<Node> enemy;
@@ -54,7 +53,6 @@ public class Main {
 		D = Integer.parseInt(st.nextToken());
 		origin_map = new int[N + 2][M + 1];
 		map = new int[N + 2][M + 1];
-		attack = new int[N + 1][M + 1];
 		visited = new boolean[M + 1];
 		origin_enemy = new ArrayList<>();
 
