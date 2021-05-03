@@ -4,29 +4,38 @@ input = sys.stdin.readline
 S = input().strip()
 P = input().strip()
 
-s_idx = []
-answer = 0
 
-for i in range(len(S)):  # 첫 문자 나오는 인덱스 저장
-    if S[i] == P[0]:
-        s_idx.append(i)
+def getPi(p):
+    size = len(p)
+    j = 0
+    pi = [0] * size
+
+    for i in range(1, size):
+        while j > 0 and p[i] != p[j]:
+            j = pi[j - 1]
+        if p[i] == p[j]:
+            j += 1
+            pi[i] = j
+
+    return pi
 
 
-for idx in s_idx:
-    flag = True
-    i = idx
-    for p in P:
-        if i >= len(S):  # S 문자열 넘어가면 종료
-            flag = False
-            break
+def KMP(s, p):
+    pi = getPi(p)
+    s_size = len(s)
+    p_size = len(p)
+    j = 0
 
-        if p != S[i]:
-            flag = False
-            break
-        else:
-            i += 1
-    if flag is True:
-        answer = 1
-        break
+    for i in range(s_size):
+        while j > 0 and s[i] != p[j]:
+            j = pi[j - 1]
+        if s[i] == p[j]:
+            if j == p_size - 1:
+                return 1
+            else:
+                j += 1
 
-print(answer)
+    return 0
+
+
+print(KMP(S, P))
