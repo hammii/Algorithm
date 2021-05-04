@@ -37,4 +37,4 @@ P = input()
 answer = KMP(T, P)
 print(answer[0])
 for idx in answer[1]:
-    print(idx+1, end=' ')
+    print(idx + 1, end=' ')
