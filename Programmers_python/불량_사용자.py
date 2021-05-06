@@ -25,7 +25,8 @@ def solution(user_id, banned_id):
 
     answer = []
     for a in product(*my_list):
-        if len(set(a)) == len(banned_id):   # 중복 선택을 제외했을 때 len 과 같은 경우
-            answer.append(frozenset(a))
+        if len(set(a)) == len(banned_id):   # 중복 선택을 제외했을 때 len이랑 같은 경우
+            if frozenset(a) not in answer:
+                answer.append(frozenset(a))
 
-    return len(set(answer))
+    return len(answer)
