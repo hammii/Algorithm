@@ -5,7 +5,6 @@ graph = [[] for _ in range(V + 1)]
 visited = [False] * (V + 1)
 max_dist = 0
 max_node = 0
-answer = 0
 
 for _ in range(V):
     line = list(map(int, sys.stdin.readline().rstrip().split()))
@@ -16,7 +15,7 @@ for _ in range(V):
 
 
 def dfs(node, dist):
-    global answer, max_dist, max_node
+    global max_dist, max_node
 
     if visited[node]:
         return
