@@ -33,7 +33,3 @@ def solution(m, n, board):
                         board[k][j] = board[i][j]
                         board[i][j] = ' '
     return answer
-
-
-board = ["CCBDE", "AAADE", "AAABF", "CCBBF"]
-print(solution(4, 5, board))
