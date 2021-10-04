@@ -9,8 +9,10 @@ for _ in range(T):
 
     dp[0][0] = num[0][0]
     dp[1][0] = num[1][0]
-    dp[0][1] = dp[1][0] + num[0][1]
-    dp[1][1] = dp[0][0] + num[1][1]
+
+    if n > 1:
+        dp[0][1] = dp[1][0] + num[0][1]
+        dp[1][1] = dp[0][0] + num[1][1]
 
     for col in range(2, n):
         dp[0][col] = max(dp[1][col - 2], dp[1][col - 1]) + num[0][col]
