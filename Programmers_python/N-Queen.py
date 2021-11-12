@@ -23,6 +23,3 @@ def solution(n):
     maps = [0] * n ** 2
     nQueen(0, maps, n)
     return answer
-
-
-print(solution(4))
