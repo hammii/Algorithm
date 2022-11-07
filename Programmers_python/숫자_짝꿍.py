@@ -1,13 +1,8 @@
-from collections import Counter
-
 def solution(X, Y):
     answer = '' 
-    x_cnt = Counter(X)
-    y_cnt = Counter(Y)
     
-    for k, v in x_cnt.items():
-        if k in y_cnt.keys():
-            answer += k * min(x_cnt[k], y_cnt[k])
+    for i in range(9, -1, -1):
+        answer += str(i) * min(X.count(str(i)), Y.count(str(i)))
             
     if answer == '':
         return '-1'
