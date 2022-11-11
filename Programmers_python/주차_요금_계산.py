@@ -1,22 +1,16 @@
+from collections import defaultdict
 import math
 
 def solution(fees, records):
     answer = []
-    record_time = {}
+    record_time = defaultdict(int)
     
     for record in records:
         time, car_num, record_type = record.split()
-        
         if record_type == 'IN':
-            if car_num in record_time.keys():
-                record_time[car_num] -= int(time.split(":")[0])*60 + int(time.split(":")[1])
-            else:
-                record_time[car_num] = 0 - (int(time.split(":")[0])*60 + int(time.split(":")[1]))
+            record_time[car_num] -= int(time.split(":")[0])*60 + int(time.split(":")[1])
         else:
-            if car_num in record_time.keys():
-                record_time[car_num] += int(time.split(":")[0])*60 + int(time.split(":")[1])    
-            else:
-                record_time[car_num] = 0 + int(time.split(":")[0])*60 + int(time.split(":")[1])
+            record_time[car_num] += int(time.split(":")[0])*60 + int(time.split(":")[1])    
         
     for key, value in record_time.items():
         if value <= 0:
