@@ -1,5 +1,4 @@
 def solution(triangle):
-    answer = 0
     dp = [[0] * len(triangle[-1]) for _ in range(len(triangle))]
     dp[0][0] = triangle[0][0]
     
